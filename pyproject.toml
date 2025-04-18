@@ -60,5 +60,19 @@ exclude_lines = [
   "if TYPE_CHECKING:",
 ]
 
-[tool.hatch.scripts]
-lint = "ruff check . && black --check . && mypy --strict src"
+[tool.hatch.envs.default]                # ← define the env
+dependencies = [                         # dev tools installed *into* the env
+  "ruff>=0.4",
+  "black>=24.3",
+  "mypy>=1.9",
+]
+
+[tool.hatch.envs.default.scripts]        # ← script lives *inside* the env
+lint = [
+  "ruff check .",
+  "black --check .",
+  "mypy --strict src",
+]
+
+[project.optional-dependencies]
+dev = ["ruff>=0.4", "black>=24.3", "mypy>=1.9"]
