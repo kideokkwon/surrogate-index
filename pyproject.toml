@@ -59,3 +59,6 @@ exclude_lines = [
   "if __name__ == .__main__.:",
   "if TYPE_CHECKING:",
 ]
+
+[tool.hatch.scripts]
+lint = "ruff check . && black --check . && mypy --strict src"
