@@ -65,6 +65,7 @@ dependencies = [                         # dev tools installed *into* the env
   "ruff>=0.4",
   "black>=24.3",
   "mypy>=1.9",
+  "pandas-stubs>=2.1.1.230316"
 ]
 
 [tool.hatch.envs.default.scripts]        # ← script lives *inside* the env
