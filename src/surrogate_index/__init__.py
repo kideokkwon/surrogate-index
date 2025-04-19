@@ -5,5 +5,5 @@ from importlib.metadata import version
 
 from .eif import SurrogateIndexEIF
 
-__all__ = ["SurrogateIndexEIF"] 
+__all__ = ["SurrogateIndexEIF"]
 __version__ = version("surrogate-index")
