@@ -72,8 +72,12 @@ dependencies = [                         # dev tools installed *into* the env
 lint = [
   "ruff check .",
   "black --check .",
-  "mypy --strict src",
+  "mypy --strict src"
 ]
+test = "pytest tests"
+
+[tool.hatch.envs.default.dependencies]
+pytest = "^8.1.1"
 
 [project.optional-dependencies]
 dev = ["ruff>=0.4", "black>=24.3", "mypy>=1.9"]
