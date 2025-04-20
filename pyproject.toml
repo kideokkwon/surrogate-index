@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "surrogate-index"
 dynamic = ["version"]
-description = ''
+description = 'Surrogate Index EIF estimation package. See: https://github.com/kideokkwon/surrogate-index'
 readme = "README.md"
 requires-python = ">=3.8"
 license = "MIT"
@@ -27,9 +27,9 @@ classifiers = [
 dependencies = []
 
 [project.urls]
-Documentation = "https://github.com/Kideok Kwon/surrogate-index#readme"
-Issues = "https://github.com/Kideok Kwon/surrogate-index/issues"
-Source = "https://github.com/Kideok Kwon/surrogate-index"
+Documentation = "https://github.com/kideokkwon/surrogate-index#readme"
+Issues = "https://github.com/kideokkwon/surrogate-index/issues"
+Source = "https://github.com/kideokkwon/surrogate-index"
 
 [tool.hatch.version]
 path = "src/surrogate_index/__about__.py"
