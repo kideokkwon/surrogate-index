@@ -80,3 +80,9 @@ test = "pytest tests"
 
 [project.optional-dependencies]
 dev = ["ruff>=0.4", "black>=24.3", "mypy>=1.9"]
+ml = [
+  "xgboost>=2.0",       # gradient boosted trees for nuisance models
+  "scikit-learn>=1.4",  # for ColumnTransformer, KFold, OneHotEncoder
+  "pandas>=2.2",
+  "numpy>=1.26"
+]
