@@ -31,7 +31,7 @@ There seem to be several companies that have utilized this methodology for vario
 
 ## Installation
 
-**This package is not on PyPI yet.** For now, clone the repo and install locally:
+**This package is not on PyPI yet. COMING SOON** For now, clone the repo and install locally:
 
 ```bash
 git clone https://github.com/kideokkwon/surrogate-index.git
