@@ -33,7 +33,7 @@ def fit_nuisance_function_primary(
     n_splits: int = 5,
     verbose: bool = False,
     tag: Optional[str] = None,
-) -> pd.Series[np.float64]:
+) -> pd.Series[float]:
     """
     Cross-fitted nuisance estimate.
 
@@ -136,7 +136,7 @@ def fit_nuisance_function_secondary(
     n_splits: int = 5,
     verbose: bool = False,
     tag: Optional[str] = None,
-) -> pd.Series[np.float64]:
+) -> pd.Series[float]:
     """
     E[ nu(S,X) | W = w_value, X, G = 0 ]
     Returns NaN for rows outside (G==0 & W==w_value).
@@ -151,7 +151,7 @@ def fit_nuisance_function_secondary(
     mask = (df["G"] == 0) & (df[w_col] == w_value)
     df_train = df.loc[mask, [dep_var] + ind_vars]
 
-    preds_full = pd.Series(np.nan, index=df.index, dtype=np.float64)
+    preds_full: pd.Series[float] = pd.Series(np.nan, index=df.index, dtype=np.float64)
     if df_train.empty:
         return preds_full  # nothing to train
 
