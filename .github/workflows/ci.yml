@@ -1,13 +1,30 @@
 name: CI
+
 on: [push, pull_request]
+
 jobs:
-  test:
+  tests:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-python@v5
-        with: { python-version: "3.11" }
-      - run: pip install -e ".[dev]"    # installs package + dev tools
-      - run: pip install hatch
-      - run: hatch run lint   # ruff + black checks (added by Hatch scaffold)
-      - run: hatch run test   # pytest
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: "pip"
+
+      - name: Install Hatch
+        run: pip install hatch
+
+      - name: Install package (dev env via Hatch)
+        run: hatch env create      # creates `.venv` per default env
+
+      - name: Lint
+        run: hatch run lint
+
+      - name: Tests
+        run: hatch run test

@@ -179,3 +179,6 @@ cython_debug/
 .ipynb_checkpoints/
 # Conda env exports (if large)
 environment*.yml
+
+scratch/
+!scratch/README.md

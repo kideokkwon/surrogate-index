@@ -1,57 +1,113 @@
+# ---------------------------------
+#   Build back-end configuration
+# ---------------------------------
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling>=1.22"]
 build-backend = "hatchling.build"
 
+# ---------------------------------
+#   Core project metadata
+# ---------------------------------
 [project]
 name = "surrogate-index"
-dynamic = ["version"]
-description = 'Surrogate Index EIF estimation package. See: https://github.com/kideokkwon/surrogate-index'
+dynamic = ["version"]                     # version read from __about__.py
+description = "Efficient-Influence-Function (EIF) utilities for surrogate-index causal inference."
 readme = "README.md"
-requires-python = ">=3.8"
-license = "MIT"
-keywords = []
+requires-python = ">=3.10"
+license = { text = "MIT" }
+
 authors = [
   { name = "Kideok Kwon", email = "kideokk16@gmail.com" },
 ]
+
 classifiers = [
   "Development Status :: 4 - Beta",
+  "License :: OSI Approved :: MIT License",
   "Programming Language :: Python",
-  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
   "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: Implementation :: CPython",
-  "Programming Language :: Python :: Implementation :: PyPy",
+  "Topic :: Scientific/Engineering :: Mathematics",
 ]
-dependencies = []
+
+# ---- Runtime dependencies needed by every user ----
+dependencies = [
+  "numpy>=1.26",
+  "pandas>=2.2",
+  "scikit-learn>=1.4",
+]
 
 [project.urls]
-Documentation = "https://github.com/kideokkwon/surrogate-index#readme"
-Issues = "https://github.com/kideokkwon/surrogate-index/issues"
-Source = "https://github.com/kideokkwon/surrogate-index"
+Homepage        = "https://github.com/kideokkwon/surrogate-index"
+Documentation   = "https://github.com/kideokkwon/surrogate-index#readme"
+Issues          = "https://github.com/kideokkwon/surrogate-index/issues"
+Source          = "https://github.com/kideokkwon/surrogate-index"
 
+# ---------------------------------
+#   Optional dependency groups
+# ---------------------------------
+[project.optional-dependencies]
+# Extra ML back-end (gradient-boosted trees)
+ml   = ["xgboost>=2.0"]
+
+# Dev / lint / type-check toolchain (for contributors)
+dev  = ["ruff>=0.4", "black>=24.3", "mypy>=1.9", "pytest>=8.1.1", "pandas-stubs>=2.1.1.230316"]
+
+# ---------------------------------
+#   Hatch version source
+# ---------------------------------
 [tool.hatch.version]
 path = "src/surrogate_index/__about__.py"
 
-[tool.hatch.envs.types]
-extra-dependencies = [
-  "mypy>=1.0.0",
+# ---------------------------------
+#   Hatch build: include type-hint marker
+# ---------------------------------
+[tool.hatch.build]
+include = ["src/surrogate_index/py.typed"]
+
+# ---------------------------------
+#   Hatch environments
+# ---------------------------------
+[tool.hatch.envs.default]
+dependencies = [
+  "ruff>=0.4",
+  "black>=24.3",
+  "mypy>=1.9",
+  "pandas-stubs>=2.1.1.230316",
+  "pytest>=8.1.1",
 ]
+
+[tool.hatch.envs.default.scripts]
+lint = [
+  # Ruff + Black formatting & static type-check
+  "ruff check .",
+  "black --check .",
+  "mypy --strict src",
+]
+test = "pytest tests"
+
+# Type-checking env (strict MyPy)
+[tool.hatch.envs.types]
+extra-dependencies = ["mypy>=1.9"]
 [tool.hatch.envs.types.scripts]
 check = "mypy --install-types --non-interactive {args:src/surrogate_index tests}"
 
+# ---------------------------------
+#   Coverage (for pytest-cov)
+# ---------------------------------
 [tool.coverage.run]
 source_pkgs = ["surrogate_index", "tests"]
 branch = true
 parallel = true
-omit = [
-  "src/surrogate_index/__about__.py",
-]
+omit = ["src/surrogate_index/__about__.py"]
 
 [tool.coverage.paths]
 surrogate_index = ["src/surrogate_index", "*/surrogate-index/src/surrogate_index"]
-tests = ["tests", "*/surrogate-index/tests"]
+tests           = ["tests", "*/surrogate-index/tests"]
 
 [tool.coverage.report]
 exclude_lines = [
@@ -60,23 +116,15 @@ exclude_lines = [
   "if TYPE_CHECKING:",
 ]
 
-[tool.hatch.envs.default]                # ← define the env
-dependencies = [                         # dev tools installed *into* the env
-  "ruff>=0.4",
-  "black>=24.3",
-  "mypy>=1.9",
-  "pandas-stubs>=2.1.1.230316",
-  "pytest>=8.1.1",
-  "pandas>=2.0"  
-]
+[tool.mypy]
+ignore_missing_imports = true
 
-[tool.hatch.envs.default.scripts]        # ← script lives *inside* the env
-lint = [
-  "ruff check .",
-  "black --check .",
-  "mypy --strict src"
-]
-test = "pytest tests"
-
-[project.optional-dependencies]
-dev = ["ruff>=0.4", "black>=24.3", "mypy>=1.9"]
+# ---------------------------------
+#   Black & Ruff config (optional)
+#   — Add if you have project-specific rules
+# ---------------------------------
+# [tool.black]
+# line-length = 88
+#
+# [tool.ruff]
+# line-length = 88
