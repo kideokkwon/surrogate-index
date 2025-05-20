@@ -26,12 +26,13 @@ classifiers = [
   "Programming Language :: Python",
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3 :: Only",
-  "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: Implementation :: CPython",
   "Topic :: Scientific/Engineering :: Mathematics",
+  "Intended Audience :: Science/Research",
+  "Operating System :: OS Independent",
 ]
 
 # ---- Runtime dependencies needed by every user ----
@@ -67,7 +68,7 @@ path = "src/surrogate_index/__about__.py"
 #   Hatch build: include type-hint marker
 # ---------------------------------
 [tool.hatch.build]
-include = ["src/surrogate_index/py.typed"]
+include = ["LICENSE", "src/surrogate_index/py.typed"]
 
 # ---------------------------------
 #   Hatch environments
