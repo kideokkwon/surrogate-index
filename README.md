@@ -5,22 +5,39 @@
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/surrogate-index.svg)](https://pypi.org/project/surrogate-index)
 -->
 
-This module is a Python implementation of [Athey et al (2016)](https://arxiv.org/pdf/1603.09326)'s Surrogate Index using the Efficient Influence Function derived by [Chen & Ritzwoller (2023)](https://arxiv.org/pdf/2107.14405), as seen below:
+## Introduction
+
+This package provides the first Python implementation of the **Surrogate Index Estimator** introduced by [Athey et al. (2016)](https://arxiv.org/pdf/1603.09326), a causal inference method for estimating long-term treatment effects using short-term randomized controlled trials (e.g., A/B tests).
+
+The core idea is to **combine a randomized experimental dataset with an external observational dataset** to estimate the **Average Treatment Effect (ATE)** on a long-term outcome that is not directly observed in the experiment (e.g., annual revenue, long-term retention). This is particularly useful in settings where long-term metrics are delayed, costly, or infeasible to measure during the experiment window.
+
+This package implements an estimator based on the **Efficient Influence Function (EIF)** derived by [Chen & Ritzwoller (2023)](https://arxiv.org/pdf/2107.14405), leveraging the **Double/Debiased Machine Learning (DML)** framework of [Chernozhukov et al. (2016)](https://arxiv.org/abs/1608.00060). EIF-based estimators enable valid inference while incorporating flexible machine learning models for nuisance components, such as short-term outcome regressions and propensity scores, without compromising asymptotic efficiency or introducing first-order bias.
+
+## Brief Mathematical Background
+
+Given the terms:
+- $w\in\\{0,1\\}$: binary treatment indicator 
+- $s$: a vector of an arbitrary number of short-term outcomes (typically used as the "metrics of interest" in an A/B Test)
+- $x$: a vector of pre-treatment covariates.
+- $y$: long-term outcome
+- $g$: binary indicator for if the user is in the observational sample ($g=1$) or the experimental sample ($g=0$)
+
+the corresponding influence function for the ATE $\tau_0$ is as follows: 
 
 $$\xi_0(b,\tau_0,\varphi)=\frac{g}{1-\pi}\left[\frac{1-\gamma(s,x)}{\gamma(s,x)}\cdot\frac{(\varrho(s,x)-\varrho(x))(y-\nu(s,x))}{\varrho(x)(1-\varrho(x))}\right]+\frac{1-g}{1-\pi}\left[\frac{w(\nu(s,x)-\bar\nu_1(x))}{\varrho(x)}-\frac{(1-w)(\nu(s,x)-\bar\nu_0(x))}{1-\varrho(x)}+(\bar\nu_1(x)-\bar\nu_0(x))-\tau_0\right]$$
 
-The Surrogate Index is a method for inferring Long-Term Outcomes using Short-term Experiments. Most AB Test are "Short-term Experiments" in the sense that while there exists a true Long-term Outcome $Y$ of interest (such as Revenue), we rely on *Short-term Outcomes* $S$ (called "Surrogates Metrics" in Athey et al) as our Outcome for our Average Treatment Effect. More specifically,
+where:
+- $\nu(s,x)=E[Y|S,X,G=1]$
+- $\varrho(s,x)=P(W=1|S,X,G=0)$
+- $\varrho(x)=P(W=1|X,G=0)$
+- $\gamma(s,x)=P(G=1|S,X)$
+- $\pi=P(G=1)$
+- $\bar\nu_w(x)=E[\nu(S,X)|W=w, X,G=0]$
 
-$$\text{ATE}_{S}=E[S(1)-S(0)]$$
-
-This is for several reasons, one being that Long-term Outcomes are, well, unobserved in the Short-term. We do not want to run each AB Test for a long period of time as it would cripple product / business velocity, but in certain cases, we are still interested in the ATE of a Long-term Outcome. In other words,
-
-$$\text{ATE}_{L}=E[Y(1)-Y(0)]$$
-
-There seem to be several companies that have utilized this methodology for various applications. Notably, [Netflix](https://netflixtechblog.com/round-2-a-survey-of-causal-inference-applications-at-netflix-fd78328ee0bb) and [Instacart](https://tech.instacart.com/instacarts-economics-team-using-surrogate-indices-to-estimate-long-run-heterogeneous-treatment-0bf7bc96c6e6), but this is the first Python implementation available publicly.
-
+Some industry examples of using this methodology (may differ in the estimation strategy) are:
+- [Netflix](https://netflixtechblog.com/round-2-a-survey-of-causal-inference-applications-at-netflix-fd78328ee0bb)
+- [Instacart](https://tech.instacart.com/instacarts-economics-team-using-surrogate-indices-to-estimate-long-run-heterogeneous-treatment-0bf7bc96c6e6)
 ---
-
 ## Table of Contents
 
 - [Installation](#installation)
