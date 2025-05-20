@@ -1,13 +1,10 @@
 # surrogate-index
 
-<!-- Commented out for now since not on PyPI yet
-[![PyPI - Version](https://img.shields.io/pypi/v/surrogate-index.svg)](https://pypi.org/project/surrogate-index)
-[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/surrogate-index.svg)](https://pypi.org/project/surrogate-index)
--->
+[![PyPI version](https://img.shields.io/pypi/v/surrogate-index.svg)](https://pypi.org/project/surrogate-index/)
 
 ## Introduction
 
-This package provides the first Python implementation of the **Surrogate Index Estimator** introduced by [Athey et al. (2016)](https://arxiv.org/pdf/1603.09326), a causal inference method for estimating long-term treatment effects using short-term randomized controlled trials (e.g., A/B tests).
+This package provides an implementation of the **Surrogate Index Estimator** introduced by [Athey et al. (2016)](https://arxiv.org/pdf/1603.09326), a causal inference method for estimating long-term treatment effects using short-term randomized controlled trials (e.g., A/B tests).
 
 The core idea is to **combine a randomized experimental dataset with an external observational dataset** to estimate the **Average Treatment Effect (ATE)** on a long-term outcome that is not directly observed in the experiment (e.g., annual revenue, long-term retention). This is particularly useful in settings where long-term metrics are delayed, costly, or infeasible to measure during the experiment window.
 
@@ -33,46 +30,55 @@ where:
 - $\gamma(s,x)=P(G=1|S,X)$
 - $\pi=P(G=1)$
 - $\bar\nu_w(x)=E[\nu(S,X)|W=w, X,G=0]$
-
-Some industry examples of using this methodology (may differ in the estimation strategy) are:
-- [Netflix](https://netflixtechblog.com/round-2-a-survey-of-causal-inference-applications-at-netflix-fd78328ee0bb)
-- [Instacart](https://tech.instacart.com/instacarts-economics-team-using-surrogate-indices-to-estimate-long-run-heterogeneous-treatment-0bf7bc96c6e6)
 ---
 ## Table of Contents
-
 - [Installation](#installation)
 - [Usage](#usage)
+- [Planned Features](#planned-features)
 - [License](#license)
 
 ---
 
 ## Installation
 
-**This package is not on PyPI yet. COMING SOON** For now, clone the repo and install locally:
-
 ```bash
-git clone https://github.com/kideokkwon/surrogate-index.git
-cd surrogate-index
-pip install -e ".[dev,ml]"
+# simplest
+pip install surrogate-index
 
-## For Conda Users
+# with ML extras (e.g. XGBoost)
+pip install "surrogate-index[ml]"
+
+# Conda users
 conda install -c conda-forge xgboost scikit-learn pandas numpy
-pip install -e ".[dev]"
-
+pip install surrogate-index
+```
 ## Usage
+
+```python
 from surrogate_index import efficient_influence_function
 
-df_exp = ...  # your experimental data
-df_obs = ...  # your observational data
+df_exp = ...  # experimental sample
+df_obs = ...  # observational sample
 
 results_df = efficient_influence_function(
     df_exp=df_exp,
     df_obs=df_obs,
     y="six_month_revenue",
     w="treatment",
-    s_cols=[...],  # surrogate metric names
-    x_cols=[...],  # covariate names
-    classifier=...,
-    regressor=...,
+    s_cols=[...],   # list of surrogate metrics
+    x_cols=[...],   # list of covariate names
+    classifier=..., # e.g., GradientBoostingClassifier()
+    regressor=...,  # e.g., XGBRegressor()
 )
+print(results_df)
 ```
+
+## Planned Features
+- Convert structure to an Object-based one (scikit-learn style)
+- Add diagnostic checks
+- Add alternative estimators provided in Athey et al. 2016
+- etc.
+
+## License
+
+Distributed under the MIT License. See `LICENSE` for details.
