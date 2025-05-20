@@ -1,0 +1,47 @@
+name: Build & Publish to PyPI
+
+on:
+  # 1. Run automatically when you push a tag like v0.1.0
+  push:
+    tags:
+      - "v*"        # matches v0.1.0, v0.1.1, etc.
+  # 2. Allow a manual trigger from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      # -- Check out source ---------------------------------------------------
+      - uses: actions/checkout@v4
+
+      # -- Set up Python ------------------------------------------------------
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # -- Install build tooling ---------------------------------------------
+      - name: Install build & upload tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install build twine hatch
+
+      # -- Build wheel (.whl) + sdist (.tar.gz) ------------------------------
+      - name: Build dist
+        run: python -m build
+
+      # -- Upload to TestPyPI -------------------------------------------------
+      - name: Publish to TestPyPI
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.TEST_PYPI_API_TOKEN }}
+        run: twine upload --repository testpypi dist/*
+
+      # -- Upload to real PyPI (only on tags) --------------------------------
+      - name: Publish to PyPI
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+        run: twine upload dist/*
