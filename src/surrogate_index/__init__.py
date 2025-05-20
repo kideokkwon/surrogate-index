@@ -15,7 +15,6 @@ Public exports
 from __future__ import annotations
 
 import sys
-from typing import TYPE_CHECKING
 
 # ---------------------------------------------------------------------
 # Python version guard
@@ -38,7 +37,3 @@ __all__: list[str] = [
     "output_inference",
     "__version__",
 ]
-
-# Optional: enable forward references for type checkers without importing heavy deps
-if TYPE_CHECKING:  # pragma: no cover
-    from . import eif  # for IDE autocompletion
