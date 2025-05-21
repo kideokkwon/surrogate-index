@@ -117,6 +117,9 @@ exclude_lines = [
   "if TYPE_CHECKING:",
 ]
 
+[tool.setuptools.packages.find]
+where = ["src"]
+
 [tool.mypy]
 ignore_missing_imports = true
 
