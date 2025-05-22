@@ -132,45 +132,60 @@ def fit_nuisance_function_secondary(
     w_col: str,
     w_value: Literal[1, 0],
     ind_vars: List[str],
-    model_template: BaseEstimator,  # regressor
+    model_template: BaseEstimator,
     n_splits: int = 5,
     verbose: bool = False,
     tag: Optional[str] = None,
 ) -> pd.Series[float]:
     """
-    E[ nu(S,X) | W = w_value, X, G = 0 ]
-    Returns NaN for rows outside (G==0 & W==w_value).
+    Fits E[nu(S,X) | W=w_value, X, G=0] and predicts on *all* experimental rows (G==0).
     """
-
     dep_var = "nu_sx"
     if dep_var not in df.columns:
         raise KeyError("nu_sx missing; run fit_nuisance_function_primary() first.")
     if not isinstance(model_template, RegressorMixin):
         raise TypeError("model_template must be a regressor.")
 
-    mask = (df["G"] == 0) & (df[w_col] == w_value)
-    df_train = df.loc[mask, [dep_var] + ind_vars]
+    mask_train = (df["G"] == 0) & (df[w_col] == w_value)  # training rows
+    mask_pred = df["G"] == 0  # we need preds here
 
-    preds_full: pd.Series[float] = pd.Series(np.nan, index=df.index, dtype=np.float64)
+    df_train = df.loc[mask_train, [dep_var] + ind_vars]
+    df_pred = df.loc[mask_pred, ind_vars]
+
+    preds_full = pd.Series(index=df.index, dtype=np.float64)
     if df_train.empty:
-        return preds_full  # nothing to train
+        return preds_full
 
+    # ---- cross-fitted predictions for the TRAINING rows (to curb over-fit) ---
     kf = KFold(n_splits=n_splits, shuffle=True, random_state=42)
-    fold_pred = pd.Series(index=df_train.index, dtype=np.float64)
+    oof = pd.Series(index=df_train.index, dtype=np.float64)
 
-    for train_idx, test_idx in kf.split(df_train):
-        tr, te = df_train.iloc[train_idx], df_train.iloc[test_idx]
-        tr_enc, te_enc, _ = encode_categoricals(tr, te)
-
+    for tr_idx, te_idx in kf.split(df_train):
+        tr, te = df_train.iloc[tr_idx], df_train.iloc[te_idx]
+        tr_enc, te_enc, encoder = encode_categoricals(
+            tr, te
+        )  # you already have this helper
         model = clone(model_template).fit(
             tr_enc.drop(columns=[dep_var]), tr_enc[dep_var]
         )
-        fold_pred.iloc[test_idx] = model.predict(te_enc.drop(columns=[dep_var]))
+        oof.iloc[te_idx] = model.predict(te_enc.drop(columns=[dep_var]))
 
-    preds_full.loc[df_train.index] = fold_pred
+    preds_full.loc[df_train.index] = oof
+
+    # ---- fit once on ALL training data, predict on *every* experimental row ---
+    train_enc, pred_enc, _ = encode_categoricals(df_train, df_pred)
+    final_model = clone(model_template).fit(
+        train_enc.drop(columns=[dep_var]), train_enc[dep_var]
+    )
+    preds_full.loc[mask_pred] = final_model.predict(pred_enc)
 
     if verbose:
         label = tag or f"{dep_var}_{w_value}"
-        logger.info("Secondary nuisance '%s' completed.", label)
+        logger.info(
+            "Secondary nuisance '%s' completed (train n=%d, pred n=%d).",
+            label,
+            mask_train.sum(),
+            mask_pred.sum(),
+        )
 
     return preds_full
