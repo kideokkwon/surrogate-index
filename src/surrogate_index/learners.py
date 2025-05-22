@@ -81,7 +81,7 @@ def fit_nuisance_function_primary(
     preds = pd.Series(index=df_use.index, dtype=np.float64)
 
     # ------- cross-fitting -------------------------------------------
-    kf = KFold(n_splits=n_splits, shuffle=True, random_state=42)
+    kf = KFold(n_splits=n_splits, shuffle=True)
     for train_idx, test_idx in kf.split(df_use):
         train_df = df_use.iloc[train_idx]
         test_df = df_use.iloc[test_idx]
@@ -157,7 +157,7 @@ def fit_nuisance_function_secondary(
         return preds_full
 
     # ---- cross-fitted predictions for the TRAINING rows (to curb over-fit) ---
-    kf = KFold(n_splits=n_splits, shuffle=True, random_state=42)
+    kf = KFold(n_splits=n_splits, shuffle=True)
     oof = pd.Series(index=df_train.index, dtype=np.float64)
 
     for tr_idx, te_idx in kf.split(df_train):
