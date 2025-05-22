@@ -146,13 +146,13 @@ def fit_nuisance_function_secondary(
     if not isinstance(model_template, RegressorMixin):
         raise TypeError("model_template must be a regressor.")
 
-    mask_train = (df["G"] == 0) & (df[w_col] == w_value)      # training rows
-    mask_pred  = (df["G"] == 0)                               # we need preds here
+    mask_train = (df["G"] == 0) & (df[w_col] == w_value)  # training rows
+    mask_pred = df["G"] == 0  # we need preds here
 
     df_train = df.loc[mask_train, [dep_var] + ind_vars]
-    df_pred  = df.loc[mask_pred,  ind_vars]
+    df_pred = df.loc[mask_pred, ind_vars]
 
-    preds_full = pd.Series(np.nan, index=df.index, dtype=np.float64)
+    preds_full = pd.Series(index=df.index, dtype=np.float64)
     if df_train.empty:
         return preds_full
 
@@ -162,7 +162,9 @@ def fit_nuisance_function_secondary(
 
     for tr_idx, te_idx in kf.split(df_train):
         tr, te = df_train.iloc[tr_idx], df_train.iloc[te_idx]
-        tr_enc, te_enc, encoder = encode_categoricals(tr, te)      # you already have this helper
+        tr_enc, te_enc, encoder = encode_categoricals(
+            tr, te
+        )  # you already have this helper
         model = clone(model_template).fit(
             tr_enc.drop(columns=[dep_var]), tr_enc[dep_var]
         )
@@ -179,7 +181,11 @@ def fit_nuisance_function_secondary(
 
     if verbose:
         label = tag or f"{dep_var}_{w_value}"
-        logger.info("Secondary nuisance '%s' completed (train n=%d, pred n=%d).",
-                    label, mask_train.sum(), mask_pred.sum())
+        logger.info(
+            "Secondary nuisance '%s' completed (train n=%d, pred n=%d).",
+            label,
+            mask_train.sum(),
+            mask_pred.sum(),
+        )
 
     return preds_full
