@@ -51,7 +51,7 @@ def efficient_influence_function(
     classifier: BaseEstimator,  # should implement predict_proba
     regressor: BaseEstimator,
     unconfounded: bool = True,
-    verbose: bool = False
+    verbose: bool = False,
 ) -> pd.DataFrame:
     """
     Computes all nuisance functions + EIF and returns a combined DataFrame.
@@ -92,7 +92,7 @@ def efficient_influence_function(
     unique_w = df_exp[w].dropna().unique()
     if set(unique_w) - {0, 1}:
         raise ValueError(f"Column '{w}' must be binary (0/1) in df_exp.")
-    
+
     # --- turn package logging on if user asked for it ---
     if verbose:
         logging.getLogger("surrogate_index").setLevel(logging.INFO)
@@ -189,7 +189,7 @@ def efficient_influence_function(
         w_value=1,
         ind_vars=x_cols,
         model_template=regressor,
-        verbose=verbose
+        verbose=verbose,
     )
     df["bar_nu_0"] = fit_nuisance_function_secondary(
         df,
@@ -197,7 +197,7 @@ def efficient_influence_function(
         w_value=0,
         ind_vars=x_cols,
         model_template=regressor,
-        verbose=verbose
+        verbose=verbose,
     )
 
     # ------------------------------------------------------------------
