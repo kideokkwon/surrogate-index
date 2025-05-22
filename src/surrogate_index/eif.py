@@ -51,6 +51,7 @@ def efficient_influence_function(
     classifier: BaseEstimator,  # should implement predict_proba
     regressor: BaseEstimator,
     unconfounded: bool = True,
+    verbose: bool = False
 ) -> pd.DataFrame:
     """
     Computes all nuisance functions + EIF and returns a combined DataFrame.
@@ -91,6 +92,10 @@ def efficient_influence_function(
     unique_w = df_exp[w].dropna().unique()
     if set(unique_w) - {0, 1}:
         raise ValueError(f"Column '{w}' must be binary (0/1) in df_exp.")
+    
+    # --- turn package logging on if user asked for it ---
+    if verbose:
+        logging.getLogger("surrogate_index").setLevel(logging.INFO)
 
     # ------------------------------------------------------------------
     # Combine experimental & observational data
@@ -144,7 +149,7 @@ def efficient_influence_function(
             ind_vars=x_cols + s_cols,
             model_template=classifier,
             is_classifier=True,
-            verbose=False,
+            verbose=verbose,
         )
         df["varrho_x"] = fit_nuisance_function_primary(
             df,
@@ -153,7 +158,7 @@ def efficient_influence_function(
             ind_vars=x_cols,
             model_template=classifier,
             is_classifier=True,
-            verbose=False,
+            verbose=verbose,
         )
         df["gamma_sx"] = fit_nuisance_function_primary(
             df,
@@ -162,7 +167,7 @@ def efficient_influence_function(
             ind_vars=x_cols + s_cols,
             model_template=classifier,
             is_classifier=True,
-            verbose=False,
+            verbose=verbose,
         )
         df["pi"] = len(df[df.G == 1]) / len(df)
 
@@ -176,7 +181,7 @@ def efficient_influence_function(
         ind_vars=x_cols + s_cols,
         model_template=regressor,
         is_classifier=False,
-        verbose=False,
+        verbose=verbose,
     )
     df["bar_nu_1"] = fit_nuisance_function_secondary(
         df,
@@ -184,6 +189,7 @@ def efficient_influence_function(
         w_value=1,
         ind_vars=x_cols,
         model_template=regressor,
+        verbose=verbose
     )
     df["bar_nu_0"] = fit_nuisance_function_secondary(
         df,
@@ -191,6 +197,7 @@ def efficient_influence_function(
         w_value=0,
         ind_vars=x_cols,
         model_template=regressor,
+        verbose=verbose
     )
 
     # ------------------------------------------------------------------
