@@ -71,6 +71,19 @@ path = "src/surrogate_index/__about__.py"
 include = ["LICENSE", "src/surrogate_index/py.typed"]
 
 # ---------------------------------
+#   Tell Hatchling to grab the src/ package
+# ---------------------------------
+[tool.hatch.build.targets.wheel]
+packages = ["src/surrogate_index"]
+
+# (optional but tidy – include tests/docs/etc. in the sdist)
+[tool.hatch.build.targets.sdist]
+include = [
+  "src/surrogate_index/**",
+  "tests/**",
+]
+
+# ---------------------------------
 #   Hatch environments
 # ---------------------------------
 [tool.hatch.envs.default]
@@ -116,9 +129,6 @@ exclude_lines = [
   "if __name__ == .__main__.:",
   "if TYPE_CHECKING:",
 ]
-
-[tool.setuptools.packages.find]
-where = ["src"]
 
 [tool.mypy]
 ignore_missing_imports = true
