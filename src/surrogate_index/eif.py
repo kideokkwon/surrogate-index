@@ -30,6 +30,8 @@ from .learners import (
     fit_nuisance_function_secondary,
 )
 from .preprocess import combine_dfs
+from ._logging import enable_verbose_logging
+
 
 # ---------------------------------------------------------------------
 # Config: logging
@@ -95,7 +97,7 @@ def efficient_influence_function(
 
     # --- turn package logging on if user asked for it ---
     if verbose:
-        logging.getLogger("surrogate_index").setLevel(logging.INFO)
+        enable_verbose_logging()
 
     # ------------------------------------------------------------------
     # Combine experimental & observational data
